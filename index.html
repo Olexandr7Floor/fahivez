@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фахівець з оцінки заходів захисту інформації — Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --border: rgba(0,229,255,0.15);
+    --glow: 0 0 30px rgba(0,229,255,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(124,58,237,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,229,255,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  #app { position: relative; z-index: 1; }
+
+  /* ── HEADER ── */
+  header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    background: rgba(10,14,26,0.85);
+    z-index: 100;
+  }
+
+  .logo {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(0,229,255,0.3);
+  }
+
+  .header-text h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .header-text p {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .progress-wrap {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .score-badge {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.75rem;
+    color: var(--accent3);
+    padding: 4px 12px;
+    border: 1px solid var(--accent3);
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .progress-bar-wrap {
+    width: 140px;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  #progressBar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  .q-counter {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── INTRO ── */
+  #intro {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+
+  #intro.active { display: flex; }
+
+  .intro-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.1s forwards;
+  }
+
+  .intro-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  .intro-title span {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .intro-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    max-width: 540px;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.3s forwards;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.4s forwards;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  .category-select {
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.45s forwards;
+  }
+
+  .category-select label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  .cat-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cat-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cat-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cat-btn.active { border-color: var(--accent); background: rgba(0,229,255,0.1); color: var(--accent); }
+
+  .btn-primary {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 1rem 3rem;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 30px rgba(0,229,255,0.2);
+    letter-spacing: 0.05em;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.5s forwards;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(0,229,255,0.35);
+  }
+
+  /* ── QUIZ ── */
+  #quiz { padding: 2rem 1.5rem; max-width: 800px; margin: 0 auto; }
+  #quiz.active { display: block; }
+
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--glow);
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .q-type-badge {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+
+  .badge-single { background: rgba(0,229,255,0.1); color: var(--accent); border: 1px solid rgba(0,229,255,0.3); }
+  .badge-multi  { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .badge-match  { background: rgba(16,185,129,0.1); color: var(--accent3); border: 1px solid rgba(16,185,129,0.3); }
+
+  .q-id {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+
+  .q-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 1.75rem;
+  }
+
+  /* Single/Multi Options */
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .option-btn {
+    width: 100%;
+    text-align: left;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 0.85rem 1.1rem;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.05);
+    transform: translateX(4px);
+  }
+
+  .option-btn.selected {
+    border-color: var(--accent2);
+    background: rgba(124,58,237,0.12);
+  }
+
+  .option-btn.correct {
+    border-color: var(--accent3);
+    background: rgba(16,185,129,0.1);
+    color: var(--accent3);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--danger);
+    background: rgba(239,68,68,0.08);
+    color: var(--danger);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  .opt-letter {
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Matching */
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 600px) { .match-grid { grid-template-columns: 1fr; } }
+
+  .match-col-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .match-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .match-item {
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .match-item.clickable:hover {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.05);
+  }
+
+  .match-item.selected-left {
+    border-color: var(--accent2);
+    background: rgba(124,58,237,0.15);
+  }
+
+  .match-item.paired {
+    border-color: var(--accent3);
+    background: rgba(16,185,129,0.08);
+    cursor: default;
+  }
+
+  .match-item.wrong-pair {
+    border-color: var(--danger);
+    background: rgba(239,68,68,0.08);
+  }
+
+  .match-pairs-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .pair-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    padding: 0.4rem;
+    border-radius: 6px;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .pair-row .pair-left { color: var(--accent); flex: 1; }
+  .pair-row .pair-sep { color: var(--text-muted); }
+  .pair-row .pair-right { color: var(--text); flex: 1; }
+
+  /* Action */
+  .action-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-check {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-check:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
+  .btn-check:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-next {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+    display: none;
+  }
+
+  .btn-next.show { display: block; }
+  .btn-next:hover { background: rgba(0,229,255,0.08); }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    margin-top: 1rem;
+    border-left: 3px solid;
+  }
+
+  .feedback.correct { background: rgba(16,185,129,0.08); border-color: var(--accent3); color: #6ee7b7; }
+  .feedback.wrong { background: rgba(239,68,68,0.08); border-color: var(--danger); color: #fca5a5; }
+  .feedback.show { display: block; animation: fadeUp 0.3s ease; }
+
+  .feedback-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  /* Timer */
+  .timer-bar {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  #timerFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent3), var(--accent));
+    border-radius: 2px;
+    transition: width 1s linear, background 0.5s;
+    width: 100%;
+  }
+
+  #timerFill.warning { background: linear-gradient(90deg, var(--danger), #f97316); }
+
+  /* ── RESULTS ── */
+  #results {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+
+  #results.active { display: flex; }
+
+  .result-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 60px rgba(0,229,255,0.25);
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .result-pct {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .result-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .result-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+  }
+
+  .result-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+
+  .result-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .res-stat {
+    padding: 1.2rem 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .res-stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  .res-stat-num.green { color: var(--accent3); }
+  .res-stat-num.red { color: var(--danger); }
+  .res-stat-num.blue { color: var(--accent); }
+
+  .res-stat-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  .result-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-secondary {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.85rem 2rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">🔐</div>
+  <div class="header-text">
+    <h1>CyberAssess Quiz</h1>
+    <p>Фахівець з оцінки заходів захисту інформації</p>
+  </div>
+  <div class="progress-wrap" id="headerProgress" style="display:none">
+    <span class="q-counter" id="qCounter">0/0</span>
+    <div class="progress-bar-wrap"><div id="progressBar"></div></div>
+    <span class="score-badge" id="scoreBadge">0 балів</span>
+  </div>
+</header>
+
+<!-- INTRO -->
+<div id="intro" class="screen active">
+  <div class="intro-tag">Тест для фахівців з кібербезпеки</div>
+  <h2 class="intro-title">Оцінка заходів<br><span>захисту інформації</span></h2>
+  <p class="intro-desc">
+    Пройдіть інтерактивний тест за стандартами NIST SP 800-53, CIS CSC, ISO/IEC 27005 та іншими.
+    Питання охоплюють трудові функції, навички та знання з кібербезпеки.
+  </p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Питань</div></div>
+    <div class="stat"><div class="stat-num">30</div><div class="stat-label">Сек / питання</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Категорії</div></div>
+  </div>
+  <div class="category-select">
+    <label>Фільтр категорій</label>
+    <div class="cat-buttons">
+      <button class="cat-btn active" data-cat="all">Усі</button>
+      <button class="cat-btn" data-cat="T">Трудові функції (T)</button>
+      <button class="cat-btn" data-cat="S">Навички (S)</button>
+      <button class="cat-btn" data-cat="K">Знання (K)</button>
+      <button class="cat-btn" data-cat="A">Здатності (A)</button>
+    </div>
+  </div>
+  <button class="btn-primary" id="startBtn">Почати тест →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="timer-bar"><div id="timerFill"></div></div>
+  <div class="question-card" id="questionCard">
+    <div class="q-meta">
+      <span class="q-type-badge badge-single" id="qTypeBadge">Single</span>
+      <span class="q-id" id="qId">—</span>
+    </div>
+    <div class="q-text" id="qText"></div>
+    <div id="qBody"></div>
+    <div class="feedback" id="feedbackBox">
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div id="feedbackText"></div>
+    </div>
+    <br>
+    <div class="action-row">
+      <button class="btn-check" id="checkBtn" disabled>Перевірити</button>
+      <button class="btn-next" id="nextBtn">Далі →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="result-circle" id="resultCircle">
+    <div class="result-pct" id="resultPct">0%</div>
+    <div class="result-label">Результат</div>
+  </div>
+  <div class="result-title" id="resultTitle">—</div>
+  <div class="result-subtitle" id="resultSubtitle"></div>
+  <div class="result-stats">
+    <div class="res-stat"><div class="res-stat-num green" id="rCorrect">0</div><div class="res-stat-label">Правильно</div></div>
+    <div class="res-stat"><div class="res-stat-num red" id="rWrong">0</div><div class="res-stat-label">Неправильно</div></div>
+    <div class="res-stat"><div class="res-stat-num blue" id="rTotal">0</div><div class="res-stat-label">Всього</div></div>
+  </div>
+  <div class="result-buttons">
+    <button class="btn-primary" id="restartBtn" style="opacity:1;animation:none">Спробувати знову</button>
+    <button class="btn-secondary" id="changeCatBtn">Змінити категорію</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ─── QUESTION DATA ────────────────────────────────────────────────────────────
+const RAW_QUESTIONS = [
+  // T — Трудові функції
+  {id:'T0145',cat:'T',type:'single',
+   text:'Яка з наступних відповідей найкраще описує основну відповідальність при керуванні та затвердженні пакетів документів з акредитації (ISO/IEC 15026-2)?',
+   opts:['Розробка нових програмних рішень для кібербезпеки','Координація створення, перевірки та затвердження документів акредитації для забезпечення відповідності стандартам','Проведення щоденного моніторингу систем на предмет загроз','Надання технічної підтримки кінцевим користувачам щодо політик безпеки'],
+   correct:[1],
+   explanation:'Керування пакетами документів з акредитації передбачає координацію процесу створення, перевірки та затвердження документів для відповідності стандартам ISO/IEC 15026-2.'},
+  {id:'T0145b',cat:'T',type:'single',
+   text:'Яка з наведених дій найкраще описує процес оцінки заходів захисту інформації в контексті кібербезпеки?',
+   opts:['Розробка нових програмних засобів для безпеки інформації','Встановлення фізичних бар\'єрів для захисту серверних кімнат','Аналіз ефективності існуючих заходів безпеки та визначення їх відповідності стандартам','Проведення тренінгів для співробітників з питань кібербезпеки'],
+   correct:[2],
+   explanation:'Оцінка заходів захисту інформації включає аналіз ефективності впроваджених заходів, визначення їх відповідності стандартам і виявлення слабких місць.'},
+  {id:'T0177',cat:'T',type:'single',
+   text:'Яка з наведених дій найкраще описує процес виконання аналізу системи безпеки, визначення пробілів в архітектурі безпеки та розробки плану управління ризиками?',
+   opts:['Розробка нових політик безпеки для організації','Встановлення антивірусного ПЗ на всі робочі станції','Оцінка поточної системи безпеки, виявлення слабких місць та створення стратегії для управління виявленими ризиками','Проведення навчання співробітників щодо основних принципів кібербезпеки'],
+   correct:[2],
+   explanation:'Аналіз системи безпеки включає оцінку існуючих заходів захисту, виявлення пробілів в архітектурі та розробку плану управління ризиками.'},
+  {id:'T0178',cat:'T',type:'single',
+   text:'Яка з наступних відповідей найкраще описує процес перегляду безпеки та розробки рекомендацій щодо включення їх у стратегію зниження ризиків?',
+   opts:['Розробка нових політик безпеки для організації','Встановлення фізичних бар\'єрів для захисту серверних кімнат','Перегляд поточних заходів безпеки, ідентифікація недоліків та формулювання рекомендацій для стратегії управління ризиками','Проведення навчання співробітників щодо основних принципів кібербезпеки','Моніторинг систем на предмет загроз у реальному часі'],
+   correct:[2],
+   explanation:'Процес перегляду безпеки включає аналіз заходів захисту, виявлення пробілів в архітектурі та розробку рекомендацій для стратегії зниження ризиків.'},
+  {id:'T0181',cat:'T',type:'single',
+   text:'Коли прикладна програма або система зазнають значних змін, який крок є найважливішим для забезпечення безпеки інформаційних ресурсів?',
+   opts:['Оновлення антивірусного програмного забезпечення','Виконання аналізу ризиків (загрози, вразливості та ймовірності їх виникнення)','Проведення навчання співробітників щодо нових функцій системи','Встановлення нових фізичних засобів безпеки','Моніторинг мережевої активності'],
+   correct:[1],
+   explanation:'При значних змінах у системі критично важливо виконати аналіз ризиків для виявлення нових загроз та розробки відповідних заходів.'},
+  {id:'T0184',cat:'T',type:'single',
+   text:'Яка діяльність включає планування та проведення оглядів авторизації безпеки та складання кейсів впевненості під час початкового встановлення систем і мереж?',
+   opts:['Встановлення останніх оновлень ПЗ безпеки','Проведення тренінгів щодо нових політик безпеки','Планування та виконання оглядів авторизації безпеки, а також створення кейсів впевненості для відповідності стандартам','Моніторинг мережевої активності для виявлення підозрілої поведінки','Розробка нових функціональних можливостей для системи'],
+   correct:[2],
+   explanation:'Це передбачає ретельне планування авторизації безпеки та документування результатів оцінки систем на ранніх етапах впровадження.'},
+  {id:'T0221',cat:'T',type:'single',
+   text:'Яка з наступних дій найкраще описує процес перегляду документів щодо авторизації та надання впевненості для підтвердження допустимого рівня ризику?',
+   opts:['Встановлення останніх оновлень ПЗ безпеки','Проведення навчальних семінарів для співробітників','Використання систем IAM для контролю доступу','Аналіз авторизаційних документів з використанням стандартів управління ризиками для підтвердження відповідності допустимим межам','Моніторинг мережевої активності'],
+   correct:[3],
+   explanation:'Перегляд документів авторизації передбачає детальний аналіз авторизаційних документів та звітів аудиту безпеки для підтвердження допустимого рівня ризику за ISO/IEC 27005.'},
+  {id:'T0243',cat:'T',type:'single',
+   text:'Який документ є ключовим для відображення особливостей проектування безпеки прикладної системи та потребує регулярного перегляду?',
+   opts:['План управління проектом','Специфікація безпеки архітектури','Інструкції з експлуатації системи','Посібник користувача','Маркетинговий план'],
+   correct:[1],
+   explanation:'Специфікація безпеки архітектури є основним документом, що описує архітектурні рішення, механізми захисту та політики доступу.'},
+  {id:'T0265',cat:'T',type:'single',
+   text:'Який крок є найважливішим для забезпечення успішного впровадження вимог безпеки та відповідних ІТ-політик, узгоджених з цілями організації?',
+   opts:['Встановлення фаєрволів на всіх мережевих пристроях','Розробка та впровадження політик безпеки, що відображають бізнес-цілі, проведення аудитів відповідності та регулярне оновлення процедур','Проведення щомісячних тренінгів з кібербезпеки','Автоматизація резервного копіювання даних','Впровадження системи контролю доступу до приміщень'],
+   correct:[1],
+   explanation:'Ключовий підхід — розробка та впровадження політик безпеки, що відображають бізнес-цілі, плюс регулярні аудити та оновлення процедур.'},
+  {id:'T0275',cat:'T',type:'single',
+   text:'Яка дія є ключовою для підтримки заходів забезпечення відповідності конфігурації системи безпеки та здійснення моніторингу?',
+   opts:['Регулярне оновлення ПЗ безпеки','Впровадження політик конфігурації безпеки та проведення регулярних аудитів для перевірки їхнього дотримання','Проведення щорічних тренінгів з кібербезпеки','Використання двофакторної автентифікації','Відсутність формалізованих процесів моніторингу відповідності'],
+   correct:[1],
+   explanation:'Впровадження чітких політик конфігурації та регулярні аудити забезпечують постійну відповідність систем безпеки встановленим стандартам.'},
+  {id:'T0309',cat:'T',type:'single',
+   text:'Який інструмент найкраще підходить для оцінки ефективності засобів контролю безпеки в організації?',
+   opts:['Splunk','Adobe Photoshop','Microsoft Word','AutoCAD','Slack'],
+   correct:[0],
+   explanation:'Splunk є SIEM-системою для збору, аналізу та візуалізації даних з різних джерел, що дозволяє оцінювати ефективність заходів безпеки.'},
+  {id:'T0344',cat:'T',type:'single',
+   text:'Який процес є ключовим для ефективного управління змінами конфігурації та релізів у інформаційних системах?',
+   opts:['Встановлення мережевих пристроїв без документування змін','Проведення регулярних ревізій конфігурації та використання систем управління конфігурацією для відстеження змін','Ігнорування процесів тестування перед впровадженням нових релізів','Відсутність стандартизованих процедур для впровадження змін'],
+   correct:[1],
+   explanation:'Регулярні ревізії та системи управління конфігурацією (Ansible, Puppet, Chef) забезпечують узгодженість змін і знижують ймовірність помилок.'},
+  {id:'T0371',cat:'T',type:'single',
+   text:'Який інструмент найкраще підходить для встановлення та моніторингу допустимих лімітів ресурсів на програмне забезпечення, мережі або системи?',
+   opts:['Microsoft Visio','SolarWinds Network Performance Monitor','Ansible','Wireshark','Nagios','Adobe Illustrator'],
+   correct:[1],
+   explanation:'SolarWinds NPM дозволяє встановлювати порогові значення для показників продуктивності та надсилати сповіщення при їх перевищенні.'},
+  {id:'T0251',cat:'T',type:'multi',
+   text:'Які дії є ключовими при розробці процесів відповідності безпеки та аудитів для зовнішніх послуг (хмарних провайдерів, ЦОД)? (Виберіть усі правильні)',
+   opts:['Визначення та документування вимог до безпеки для зовнішніх послуг','Підписання договорів з положеннями про безпеку та конфіденційність','Проведення регулярних аудиторських перевірок відповідності','Обмеження доступу зовнішніх послуг без належної авторизації','Відсутність моніторингу дій зовнішніх послуг','Використання автоматизованих інструментів для оцінки ризиків'],
+   correct:[0,1,2,3,5],
+   explanation:'Відсутність моніторингу (варіант 5) є неприпустимою, оскільки призводить до невиявлення порушень безпеки.'},
+  {id:'T0255',cat:'T',type:'multi',
+   text:'Які дії є ключовими для участі в корпоративному процесі управління ризиками з метою забезпечення зменшення ризиків безпеки? (Виберіть усі правильні)',
+   opts:['Проведення регулярних безпекових аудитів','Розробка та впровадження політик та процедур безпеки','Ігнорування незначних безпекових інцидентів','Співпраця з іншими відділами для обміну інформацією про ризики','Використання застарілих інструментів оцінки ризиків','Постійний моніторинг та оновлення даних про ризики'],
+   correct:[0,1,3,5],
+   explanation:'Ігнорування незначних інцидентів і застарілі інструменти збільшують ризики та знижують ефективність управління безпекою.'},
+  {id:'T0277',cat:'T',type:'multi',
+   text:'Які кроки є найважливішими для забезпечення відповідності дій з придбання, постачання та аутсорсингу вимогам кібербезпеки? (Виберіть усі правильні)',
+   opts:['Проведення технічної оцінки постачальників','Використання загальних контрактних умов без положень щодо безпеки','Інтеграція вимог кібербезпеки в процес закупівлі','Ігнорування попереднього досвіду постачальників у сфері кібербезпеки','Проведення регулярних аудитів постачальників','Відсутність формалізованих процесів оцінки безпеки'],
+   correct:[0,2,4],
+   explanation:'Технічна оцінка постачальників, інтеграція вимог кібербезпеки в закупівлю та регулярні аудити є ключовими для безпечного ланцюжка постачання.'},
+  {id:'T0272',cat:'T',type:'single',
+   text:'Який інструмент найкраще підходить для розробки та управління планами дій і відновлення для усунення вразливостей, виявлених під час оцінки ризиків?',
+   opts:['Microsoft Excel','Trello','ServiceNow','Microsoft Word','Google Docs'],
+   correct:[2],
+   explanation:'ServiceNow — потужна платформа для автоматизації реагування на інциденти, управління планами відновлення та інтеграції з іншими системами безпеки.'},
+
+  // S — Навички
+  {id:'S0001a',cat:'S',type:'single',
+   text:'Якими інструментами проводиться Фазинг (Fuzzing)?',
+   opts:['Burp Suite, OWASP ZAP, ZZuf','Nmap, Wireshark, OpenSSL','Jenkins, CircleCI, Selenium','SonarQube, JIRA, Trello'],
+   correct:[0],
+   explanation:'Fuzzing-інструменти: Burp Suite (веб-тестування), OWASP ZAP (сканер вразливостей), ZZuf (генератор мутацій вхідних даних).'},
+  {id:'S0001b',cat:'S',type:'single',
+   text:'Що означає термін "нульовий день" (zero-day) у контексті вразливостей?',
+   opts:['Вразливість, яка була виявлена та виправлена','Вразливість, яка ще не була виявлена','Вразливість, для якої ще немає виправлення','Вразливість, виявлена під час планового аудиту'],
+   correct:[2],
+   explanation:'Zero-day — вразливість, для якої ще не існує виправлення або патчу. Розробники мають "нуль днів" для виправлення до її використання зловмисниками.'},
+  {id:'S0001c',cat:'S',type:'single',
+   text:'Який інструмент використовується для тестування безпеки API?',
+   opts:['Apache Meter','OWASP ZAP (Zed Attack Proxy)','Selectium Web','Jebkins'],
+   correct:[1],
+   explanation:'OWASP ZAP — провідний інструмент для тестування безпеки веб-додатків та API, що підтримує автоматичне сканування та мануальне тестування.'},
+  {id:'S0006a',cat:'S',type:'single',
+   text:'Який метод перевіряє цілісність даних у базі даних?',
+   opts:['Регулярне резервне копіювання даних','Використання контрольних сум або хешування для валідації даних','Створення копій бази даних на різних серверах','Запуск тестів продуктивності бази даних'],
+   correct:[1],
+   explanation:'Контрольні суми та хешування дозволяють перевірити, чи не було змінено дані без авторизації, забезпечуючи цілісність.'},
+  {id:'S0027a',cat:'S',type:'multi',
+   text:'Які з наведених характеристик визначають відмовостійкість системи безпеки? (Виберіть усі правильні)',
+   opts:['Наявність резервних копій даних','Регулярне оновлення програмного забезпечення','Наявність системи контролю доступу','Можливість автоматичного відновлення після збоїв'],
+   correct:[0,3],
+   explanation:'Відмовостійкість визначається резервними копіями та автоматичним відновленням. Оновлення покращують безпеку, але не відмовостійкість.'},
+  {id:'S0027b',cat:'S',type:'single',
+   text:'Яка стратегія найбільш ефективна для підвищення надійності системи безпеки?',
+   opts:['Впровадження однократного контролю доступу','Розгортання багаторівневого захисту','Ігнорування регулярних перевірок безпеки','Використання старих версій ПЗ'],
+   correct:[1],
+   explanation:'Багаторівневий захист створює додаткові бар\'єри для атак та підвищує загальну надійність системи.'},
+  {id:'S0073a',cat:'S',type:'single',
+   text:'Яка функція Microsoft Hyper-V дозволяє створювати та управляти віртуальними мережами?',
+   opts:['Virtual Network Manager','Hyper-V Manager','Network Isolation','Virtual Switch Manager'],
+   correct:[3],
+   explanation:'Virtual Switch Manager у Hyper-V дозволяє створювати та керувати віртуальними комутаторами для зв\'язку між ВМ та зовнішніми мережами.'},
+  {id:'S0073b',cat:'S',type:'single',
+   text:'Яка послуга Amazon EC2 дозволяє автоматично налаштовувати масштабування віртуальних машин?',
+   opts:['Auto Scaling','Elastic Load Balancing','Elastic Block Store','Amazon RDS'],
+   correct:[0],
+   explanation:'Auto Scaling автоматично додає або видаляє інстанси EC2 залежно від навантаження для оптимальної продуктивності.'},
+  {id:'S0078a',cat:'S',type:'single',
+   text:'Який тип атаки характеризується використанням шкідливих скриптів у контексті браузера жертви?',
+   opts:['XSS','CSRF','DDoS','Phishing'],
+   correct:[0],
+   explanation:'XSS (Cross-Site Scripting) — впровадження шкідливих скриптів на веб-сторінки для крадіжки сесій та виконання несанкціонованих дій.'},
+  {id:'S0078b',cat:'S',type:'single',
+   text:'Яка вразливість дозволяє атакуючим виконувати код на віддаленій машині?',
+   opts:['Вразливість переповнення буфера','Вразливість SQL Injection','Вразливість XSS','Вразливість CSRF'],
+   correct:[0],
+   explanation:'Buffer Overflow дозволяє переповнити пам\'ять програми та замінити адресу повернення для виконання шкідливого коду на віддаленій машині.'},
+  {id:'S0097a',cat:'S',type:'single',
+   text:'Яка технологія забезпечує цілісність даних під час їх передачі через мережу?',
+   opts:['SSL/TLS','VPN','IDS/IPS','Антивірусні програми'],
+   correct:[0],
+   explanation:'SSL/TLS забезпечує захист даних під час передачі через мережу, гарантуючи їх цілісність, конфіденційність та аутентифікацію.'},
+  {id:'S0124a',cat:'S',type:'single',
+   text:'Яка аномалія може вказувати на проблеми в роботі системи кібербезпеки?',
+   opts:['Постійно низький рівень використання ресурсів мережі','Незвично велика кількість підключень до зовнішніх IP-адрес','Відсутність оновлень ПЗ','Зменшення обсягу логів активності'],
+   correct:[1],
+   explanation:'Велика кількість підключень до невідомих зовнішніх IP — типова ознака компрометації: ботнет або витік даних.'},
+  {id:'S0137a',cat:'S',type:'single',
+   text:'Що таке DAST?',
+   opts:['Метод статичного аналізу коду на етапі розробки','Технологія для динамічного тестування безпеки веб-додатків під час їх виконання','Процес оцінки вразливостей на основі архітектури ПЗ','Методологія управління конфігурацією'],
+   correct:[1],
+   explanation:'DAST (Dynamic Application Security Testing) виявляє вразливості веб-додатків у реальному часі без доступу до вихідного коду.'},
+  {id:'S0138a',cat:'S',type:'single',
+   text:'Яка роль PKI у забезпеченні безпеки електронної пошти?',
+   opts:['Декодування зашифрованих повідомлень','Генерація та управління ключами для шифрування та цифрового підпису','Сканування листів на наявність шкідливого коду','Аутентифікація за допомогою паролів'],
+   correct:[1],
+   explanation:'PKI забезпечує структуру для генерації та управління ключами, які використовуються для шифрування та цифрових підписів.'},
+  {id:'S0138b',cat:'S',type:'single',
+   text:'Який протокол використовує PKI для захисту даних у мережі?',
+   opts:['FTP','SSH','HTTP','IMAP'],
+   correct:[1],
+   explanation:'SSH використовує PKI для аутентифікації користувачів та шифрування даних при підключенні.'},
+  {id:'S0147a',cat:'S',type:'single',
+   text:'Який документ визначає рекомендації для захисту критичних інформаційних інфраструктур?',
+   opts:['ISO 9001','NIST SP 800-53','PCI DSS','ITIL'],
+   correct:[1],
+   explanation:'NIST SP 800-53 — керівний документ з кібербезпеки, що надає рекомендації щодо засобів захисту інформаційних систем.'},
+  {id:'S0147b',cat:'S',type:'single',
+   text:'Скільки основних контролів містить стандарт CIS CSC (Critical Security Controls)?',
+   opts:['10','15','20','25'],
+   correct:[2],
+   explanation:'CIS CSC містить 20 основних контролів для структурованого захисту інформаційних систем від кіберзагроз.'},
+  {id:'S0172a',cat:'S',type:'single',
+   text:'Який метод хешування найкраще забезпечує криптографічний захист паролів?',
+   opts:['bcrypt','MD5','ROT13','Base64'],
+   correct:[0],
+   explanation:'bcrypt — сучасний алгоритм для хешування паролів із «сіллю» (salt) та адаптивною складністю. MD5 застарілий і вразливий до колізій.'},
+  {id:'S0173a',cat:'S',type:'single',
+   text:'Що із перелічених систем є SIEM-системою?',
+   opts:['Splunk','SIEM-матор','MicroFocus Fortify','PRTG 1000'],
+   correct:[0],
+   explanation:'Splunk — багатофункціональна SIEM-система для моніторингу та кореляції подій безпеки.'},
+
+  // K — Знання
+  {id:'K0018',cat:'K',type:'single',
+   text:'Що таке алгоритм шифрування RSA?',
+   opts:['Симетричний алгоритм шифрування з одним ключем','Асиметричний алгоритм шифрування з відкритим та закритим ключем','Алгоритм хешування для перевірки цілісності даних','Протокол для безпечного обміну ключами через незахищений канал'],
+   correct:[1],
+   explanation:'RSA — асиметричний алгоритм шифрування, що використовує пари ключів (відкритий/закритий). Широко застосовується для шифрування та цифрових підписів.'},
+  {id:'K0019',cat:'K',type:'single',
+   text:'Що таке управління криптографічними ключами?',
+   opts:['Процес захисту мережевих протоколів','Процес генерації, зберігання, розподілу та знищення криптографічних ключів','Метод шифрування даних у базах даних','Технологія забезпечення доступності мережевих ресурсів'],
+   correct:[1],
+   explanation:'Управління криптографічними ключами охоплює весь життєвий цикл ключів: генерацію, зберігання, розподіл, ротацію та знищення.'},
+  {id:'K0037',cat:'K',type:'single',
+   text:'Що описує процес оцінки стану безпеки та авторизації (A&A)?',
+   opts:['Оцінка продуктивності мережевих пристроїв','Систематична процедура перевірки та авторизації ІС для обробки, зберігання та передачі інформації','Розробка нових методів шифрування даних','Управління кінцевими точками в корпоративній мережі'],
+   correct:[1],
+   explanation:'Процес A&A — систематична перевірка інформаційних систем для підтвердження їх відповідності вимогам безпеки та надання авторизації.'},
+  {id:'K0049',cat:'K',type:'single',
+   text:'Що таке DMZ (демілітаризована зона) у контексті мережевої безпеки?',
+   opts:['Мережевий сегмент без захисту для тестування','Ізольований мережевий сегмент між внутрішньою мережею та Інтернетом для розміщення публічних сервісів','Зона для зберігання резервних копій даних','Мережа лише для адміністраторів безпеки'],
+   correct:[1],
+   explanation:'DMZ — ізольований сегмент між внутрішньою мережею та Інтернетом, де розміщуються публічні сервіси (веб-сервери, поштові сервери).'},
+  {id:'K0056',cat:'K',type:'single',
+   text:'Що таке PKI (Public Key Infrastructure)?',
+   opts:['Мережевий протокол для передачі даних','Система для управління цифровими сертифікатами та криптографічними ключами','Програмне забезпечення для шифрування дисків','Метод аутентифікації за допомогою паролів'],
+   correct:[1],
+   explanation:'PKI — інфраструктура відкритих ключів для управління цифровими сертифікатами, що забезпечує аутентифікацію та шифрування.'},
+  {id:'K0070',cat:'K',type:'single',
+   text:'Що таке SQL-ін\'єкція?',
+   opts:['Метод оптимізації запитів до бази даних','Атака, при якій шкідливий SQL-код вставляється у вхідні дані для маніпуляції базою даних','Процес резервного копіювання бази даних','Технологія для прискорення роботи бази даних'],
+   correct:[1],
+   explanation:'SQL-ін\'єкція — атака, при якій шкідливий SQL-код вставляється у вхідні дані, що дозволяє маніпулювати базою даних або отримати несанкціонований доступ.'},
+  {id:'K0126',cat:'K',type:'single',
+   text:'Що описує методику управління ризиками в ланцюжку постачання (SCRM)?',
+   opts:['Управління логістикою та доставкою товарів','Ідентифікація та мінімізація ризиків безпеки від постачальників компонентів та послуг','Оптимізація процесів виробництва','Управління контрактами з постачальниками'],
+   correct:[1],
+   explanation:'SCRM (Supply Chain Risk Management) — процес виявлення та мінімізації ризиків безпеки, пов\'язаних із постачальниками компонентів, ПЗ та послуг.'},
+  {id:'K0179',cat:'K',type:'single',
+   text:'Що таке ешелонований захист (Defense-in-Depth)?',
+   opts:['Захист лише зовнішнього периметра мережі','Стратегія безпеки, що використовує кілька рівнів захисту для мінімізації ризику','Метод шифрування даних на всіх рівнях мережі','Система моніторингу мережевого трафіку'],
+   correct:[1],
+   explanation:'Defense-in-Depth — стратегія безпеки з кількома рівнями захисту, де компрометація одного рівня не призводить до повного порушення безпеки.'},
+  {id:'K0203',cat:'K',type:'single',
+   text:'Що описує модель безпеки Белла-Лападули?',
+   opts:['Модель управління доступом, що фокусується на цілісності даних','Модель обов\'язкового контролю доступу, що запобігає витоку секретної інформації (No Read Up, No Write Down)','Модель дискреційного контролю доступу на основі прав власника','Модель рольового контролю доступу на основі посад'],
+   correct:[1],
+   explanation:'Модель Белла-Лападули — обов\'язковий контроль доступу: суб\'єкти не можуть читати об\'єкти вищого рівня (No Read Up) та записувати в нижчі (No Write Down).'},
+  {id:'K0342',cat:'K',type:'single',
+   text:'Що таке тестування на проникнення (Penetration Testing)?',
+   opts:['Автоматичне сканування мережі на наявність вразливостей','Авторизована симуляція кібератаки для виявлення вразливостей до того, як це зроблять зловмисники','Процес розробки нового програмного забезпечення безпеки','Метод шифрування конфіденційних даних'],
+   correct:[1],
+   explanation:'Penetration Testing — авторизована симуляція кібератаки для виявлення вразливостей в системах до того, як це зроблять реальні зловмисники.'},
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = 0;
+let selectedCat = 'all';
+let timerInterval = null;
+let timeLeft = 30;
+let matchLeft = null;
+let matchPairs = {};
+let answered_q = false;
+
+// Matching questions (processed separately)
+const MATCH_QUESTIONS = [
+  {id:'S0006b',cat:'S',type:'match',
+   text:'Встановіть відповідність між заходом безпеки та принципом, якому він відповідає:',
+   left:['Резервне копіювання даних','Шифрування переданих даних','Контрольні суми для верифікації','Багатофакторна аутентифікація'],
+   right:['Цілісність','Доступність','Конфіденційність','Аутентифікація'],
+   correct:{'0':'1','1':'2','2':'0','3':'3'},
+   explanation:'Резервне копіювання → Доступність; Шифрування → Конфіденційність; Контрольні суми → Цілісність; МФА → Аутентифікація.'},
+  {id:'S0034a',cat:'S',type:'match',
+   text:'Встановіть відповідність між контролем безпеки та його дією:',
+   left:['Тестування на проникнення','Аудит безпеки','Багатофакторна аутентифікація','Моніторинг мережевого трафіку'],
+   right:['Перевірка на несанкціонований доступ','Виявлення підозрілих активностей','Оцінка відповідності стандартам','Додатковий рівень захисту доступу'],
+   correct:{'0':'0','1':'2','2':'3','3':'1'},
+   explanation:'Penetration Testing → перевірка доступу; Аудит → відповідність стандартам; МФА → захист доступу; Моніторинг → виявлення аномалій.'},
+  {id:'T0177b',cat:'T',type:'match',
+   text:'Співставте етапи процесу аналізу системи безпеки та управління ризиками з їх описами:',
+   left:['Аналіз поточної системи безпеки','Ідентифікація пробілів','Оцінка ризиків','Розробка плану управління','Впровадження заходів'],
+   right:['Вивчення існуючих заходів на ефективність','Визначення слабких місць','Визначення ймовірності та впливу загроз','Стратегії для мінімізації ризиків','Реалізація заходів для покращення безпеки'],
+   correct:{'0':'0','1':'1','2':'2','3':'3','4':'4'},
+   explanation:'Послідовність: Аналіз → Ідентифікація пробілів → Оцінка ризиків → Розробка плану → Впровадження.'},
+  {id:'S0078c',cat:'S',type:'match',
+   text:'Встановіть відповідність між типами атак і їх особливостями:',
+   left:['Phishing','Ransomware','Brute Force Attack','Session Hijacking'],
+   right:['Перехоплення сеансу для несанкціонованого доступу','Блокування даних та вимога викупу','Автоматизований підбір паролів','Соціальна інженерія для отримання даних'],
+   correct:{'0':'3','1':'1','2':'2','3':'0'},
+   explanation:'Phishing → соціальна інженерія; Ransomware → блокування/викуп; Brute Force → підбір паролів; Session Hijacking → перехоплення сеансу.'},
+];
+
+const ALL_QUESTIONS = [...RAW_QUESTIONS, ...MATCH_QUESTIONS];
+
+// ─── DOM ─────────────────────────────────────────────────────────────────────
+const $intro     = document.getElementById('intro');
+const $quiz      = document.getElementById('quiz');
+const $results   = document.getElementById('results');
+const $startBtn  = document.getElementById('startBtn');
+const $checkBtn  = document.getElementById('checkBtn');
+const $nextBtn   = document.getElementById('nextBtn');
+const $restartBtn= document.getElementById('restartBtn');
+const $changeCat = document.getElementById('changeCatBtn');
+const $qText     = document.getElementById('qText');
+const $qBody     = document.getElementById('qBody');
+const $qTypeBadge= document.getElementById('qTypeBadge');
+const $qId       = document.getElementById('qId');
+const $feedback  = document.getElementById('feedbackBox');
+const $fTitle    = document.getElementById('feedbackTitle');
+const $fText     = document.getElementById('feedbackText');
+const $progressBar = document.getElementById('progressBar');
+const $qCounter  = document.getElementById('qCounter');
+const $scoreBadge= document.getElementById('scoreBadge');
+const $timerFill = document.getElementById('timerFill');
+const $hProgress = document.getElementById('headerProgress');
+const $statTotal = document.getElementById('statTotal');
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function updateStatTotal() {
+  const cat = selectedCat;
+  const filtered = cat === 'all' ? ALL_QUESTIONS : ALL_QUESTIONS.filter(q => q.cat === cat);
+  $statTotal.textContent = filtered.length;
+}
+updateStatTotal();
+
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedCat = btn.dataset.cat;
+    updateStatTotal();
+  });
+});
+
+$startBtn.addEventListener('click', startQuiz);
+$checkBtn.addEventListener('click', checkAnswer);
+$nextBtn.addEventListener('click', nextQuestion);
+$restartBtn.addEventListener('click', () => { showScreen('intro'); });
+$changeCat.addEventListener('click', () => { showScreen('intro'); });
+
+function showScreen(name) {
+  [$intro, $quiz, $results].forEach(el => el.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  const cat = selectedCat;
+  const pool = cat === 'all' ? ALL_QUESTIONS : ALL_QUESTIONS.filter(q => q.cat === cat);
+  questions = shuffle(pool).slice(0, Math.min(15, pool.length));
+  current = 0; score = 0; answered = 0;
+  $hProgress.style.display = 'flex';
+  showScreen('quiz');
+  renderQuestion();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderQuestion() {
+  const q = questions[current];
+  answered_q = false;
+  matchLeft = null; matchPairs = {};
+
+  // meta
+  $qId.textContent = q.id;
+  $qText.textContent = q.text;
+  $feedback.className = 'feedback';
+  $nextBtn.classList.remove('show');
+  $checkBtn.style.display = '';
+  $checkBtn.disabled = true;
+
+  // badge
+  if (q.type === 'single') { $qTypeBadge.textContent = 'Одна відповідь'; $qTypeBadge.className = 'q-type-badge badge-single'; }
+  else if (q.type === 'multi') { $qTypeBadge.textContent = 'Кілька відповідей'; $qTypeBadge.className = 'q-type-badge badge-multi'; }
+  else { $qTypeBadge.textContent = 'Встановіть відповідність'; $qTypeBadge.className = 'q-type-badge badge-match'; }
+
+  // body
+  if (q.type === 'single' || q.type === 'multi') {
+    renderOptions(q);
+  } else {
+    renderMatch(q);
+  }
+
+  // progress
+  $qCounter.textContent = `${current+1}/${questions.length}`;
+  $progressBar.style.width = `${((current)/questions.length)*100}%`;
+  $scoreBadge.textContent = `${score} балів`;
+
+  // timer
+  startTimer();
+}
+
+function renderOptions(q) {
+  const letters = ['A','B','C','D','E','F'];
+  $qBody.innerHTML = `<div class="options-list" id="optsList"></div>`;
+  const list = document.getElementById('optsList');
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', () => toggleOption(btn, i, q));
+    list.appendChild(btn);
+  });
+}
+
+function toggleOption(btn, idx, q) {
+  if (answered_q) return;
+  if (q.type === 'single') {
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  } else {
+    btn.classList.toggle('selected');
+  }
+  const selected = document.querySelectorAll('.option-btn.selected');
+  $checkBtn.disabled = selected.length === 0;
+}
+
+function renderMatch(q) {
+  const rightShuffled = shuffle([...q.right.map((r,i) => ({text:r, origIdx:i}))]);
+  $qBody.innerHTML = `
+    <div class="match-grid">
+      <div>
+        <div class="match-col-label">Ліворуч</div>
+        <div class="match-items" id="matchLeft">
+          ${q.left.map((l,i) => `<div class="match-item clickable" data-idx="${i}">${i+1}. ${l}</div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="match-col-label">Праворуч</div>
+        <div class="match-items" id="matchRight">
+          ${rightShuffled.map((r,i) => `<div class="match-item clickable" data-orig="${r.origIdx}" data-shuffle="${i}">${String.fromCharCode(65+i)}. ${r.text}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:1rem">
+      <div class="match-col-label">Ваші пари</div>
+      <div class="match-pairs-display" id="matchPairsDisplay"></div>
+    </div>`;
+
+  document.querySelectorAll('#matchLeft .match-item').forEach(el => {
+    el.addEventListener('click', () => selectMatchLeft(el, q));
+  });
+  document.querySelectorAll('#matchRight .match-item').forEach(el => {
+    el.addEventListener('click', () => selectMatchRight(el, q));
+  });
+}
+
+function selectMatchLeft(el, q) {
+  if (answered_q || el.classList.contains('paired')) return;
+  document.querySelectorAll('#matchLeft .match-item').forEach(e => e.classList.remove('selected-left'));
+  el.classList.add('selected-left');
+  matchLeft = el.dataset.idx;
+}
+
+function selectMatchRight(el, q) {
+  if (answered_q || matchLeft === null || el.classList.contains('paired')) return;
+  const leftIdx = matchLeft;
+  const rightOrig = el.dataset.orig;
+
+  // Remove existing pair for this left item
+  if (matchPairs[leftIdx] !== undefined) {
+    const oldRight = document.querySelector(`#matchRight [data-orig="${matchPairs[leftIdx]}"]`);
+    if (oldRight) oldRight.classList.remove('paired');
+  }
+  matchPairs[leftIdx] = rightOrig;
+
+  // Mark as paired
+  document.querySelector(`#matchLeft [data-idx="${leftIdx}"]`).classList.remove('selected-left');
+  el.classList.add('paired');
+
+  matchLeft = null;
+  updatePairsDisplay(q);
+
+  if (Object.keys(matchPairs).length === q.left.length) {
+    $checkBtn.disabled = false;
+  }
+}
+
+function updatePairsDisplay(q) {
+  const display = document.getElementById('matchPairsDisplay');
+  display.innerHTML = Object.entries(matchPairs).map(([l, r]) => {
+    const leftText = q.left[parseInt(l)];
+    const rightText = q.right[parseInt(r)];
+    return `<div class="pair-row"><span class="pair-left">${parseInt(l)+1}. ${leftText}</span><span class="pair-sep">→</span><span class="pair-right">${rightText}</span></div>`;
+  }).join('');
+}
+
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 30;
+  $timerFill.style.width = '100%';
+  $timerFill.className = '';
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const pct = (timeLeft / 30) * 100;
+    $timerFill.style.width = pct + '%';
+    if (timeLeft <= 10) $timerFill.classList.add('warning');
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered_q) timeUp();
+    }
+  }, 1000);
+}
+
+function timeUp() {
+  answered_q = true;
+  $checkBtn.disabled = true;
+  showFeedback(false, '⏱ Час вийшов!', questions[current].explanation || '');
+  $nextBtn.classList.add('show');
+  $checkBtn.style.display = 'none';
+}
+
+// ─── CHECK ───────────────────────────────────────────────────────────────────
+function checkAnswer() {
+  clearInterval(timerInterval);
+  answered_q = true;
+  const q = questions[current];
+  answered++;
+
+  let correct = false;
+  if (q.type === 'single') {
+    correct = checkSingle(q);
+  } else if (q.type === 'multi') {
+    correct = checkMulti(q);
+  } else {
+    correct = checkMatch(q);
+  }
+
+  if (correct) score++;
+  $scoreBadge.textContent = `${score} балів`;
+  showFeedback(correct, correct ? '✓ Правильно!' : '✗ Неправильно', q.explanation || '');
+  $nextBtn.classList.add('show');
+  $checkBtn.style.display = 'none';
+}
+
+function checkSingle(q) {
+  let correct = false;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    const isCorrect = q.correct.includes(i);
+    const isSelected = btn.classList.contains('selected');
+    if (isSelected && isCorrect) { correct = true; btn.classList.add('correct'); }
+    else if (isSelected && !isCorrect) { btn.classList.add('wrong'); }
+    else if (!isSelected && isCorrect) { btn.classList.add('correct'); }
+    btn.disabled = true;
+  });
+  return correct;
+}
+
+function checkMulti(q) {
+  const selectedIdxs = [];
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    if (btn.classList.contains('selected')) selectedIdxs.push(i);
+  });
+  const correctSet = new Set(q.correct);
+  const selectedSet = new Set(selectedIdxs);
+  const correct = [...correctSet].every(i => selectedSet.has(i)) && [...selectedSet].every(i => correctSet.has(i));
+
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    const isCorrect = correctSet.has(i);
+    const isSelected = btn.classList.contains('selected');
+    if (isCorrect) btn.classList.add('correct');
+    else if (isSelected) btn.classList.add('wrong');
+    btn.disabled = true;
+  });
+  return correct;
+}
+
+function checkMatch(q) {
+  let allCorrect = true;
+  Object.entries(matchPairs).forEach(([l, r]) => {
+    const leftEl = document.querySelector(`#matchLeft [data-idx="${l}"]`);
+    const rightEl = document.querySelector(`#matchRight [data-orig="${r}"]`);
+    const expected = q.correct[l];
+    if (r === expected) {
+      leftEl.style.borderColor = 'var(--accent3)';
+      rightEl.style.borderColor = 'var(--accent3)';
+    } else {
+      leftEl.classList.add('wrong-pair'); leftEl.classList.remove('paired');
+      rightEl.classList.add('wrong-pair');
+      allCorrect = false;
+    }
+  });
+  return allCorrect;
+}
+
+function showFeedback(correct, title, text) {
+  $fTitle.textContent = title;
+  $fText.textContent = text;
+  $feedback.className = `feedback ${correct ? 'correct' : 'wrong'} show`;
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showResults();
+  } else {
+    $progressBar.style.width = `${(current/questions.length)*100}%`;
+    document.getElementById('questionCard').style.animation = 'none';
+    setTimeout(() => {
+      document.getElementById('questionCard').style.animation = '';
+      renderQuestion();
+    }, 10);
+  }
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  $hProgress.style.display = 'none';
+  $progressBar.style.width = '100%';
+  const pct = Math.round((score / questions.length) * 100);
+  document.getElementById('resultPct').textContent = pct + '%';
+  document.getElementById('rCorrect').textContent = score;
+  document.getElementById('rWrong').textContent = questions.length - score;
+  document.getElementById('rTotal').textContent = questions.length;
+
+  let title = '', subtitle = '';
+  if (pct >= 90) { title = '🏆 Відмінно!'; subtitle = 'Ви демонструєте експертний рівень знань з кібербезпеки.'; }
+  else if (pct >= 70) { title = '✅ Добре!'; subtitle = 'Гарний результат! Є кілька тем для поглибленого вивчення.'; }
+  else if (pct >= 50) { title = '📚 Задовільно'; subtitle = 'Базові знання є, але рекомендується додаткове вивчення матеріалу.'; }
+  else { title = '💪 Потрібна практика'; subtitle = 'Рекомендуємо опрацювати матеріал та пройти тест знову.'; }
+
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSubtitle').textContent = subtitle;
+
+  if (pct >= 70) {
+    document.getElementById('resultCircle').style.borderColor = 'var(--accent3)';
+    document.getElementById('resultPct').style.color = 'var(--accent3)';
+  } else if (pct < 50) {
+    document.getElementById('resultCircle').style.borderColor = 'var(--danger)';
+    document.getElementById('resultPct').style.color = 'var(--danger)';
+  }
+
+  showScreen('results');
+}
+</script>
+</body>
+</html>
